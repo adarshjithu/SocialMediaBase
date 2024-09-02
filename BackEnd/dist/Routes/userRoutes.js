@@ -1,0 +1,28 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const userRepository_1 = __importDefault(require("../Repositories/user/userRepository"));
+const userService_1 = __importDefault(require("../Services/userService"));
+const userControler_1 = __importDefault(require("../Controlers/userControler"));
+const userAuth_1 = require("../Middleware/userAuth");
+const userRouter = express_1.default.Router();
+// userRouter.get("/register", (req, res) => {});
+const userRepository = new userRepository_1.default();
+const userServices = new userService_1.default(userRepository);
+const controler = new userControler_1.default(userServices);
+userRouter.post("/register", (req, res, next) => { controler.registerUser(req, res, next); });
+userRouter.post("/otp/submit", (req, res, next) => { controler.verifyOtp(req, res, next); });
+userRouter.post('/verify-email', (req, res, next) => controler.verifyEmail(req, res, next));
+userRouter.get('/otp/resend/:id', (req, res, next) => { controler.resendOtp(req, res, next); });
+userRouter.get("/logout", (req, res, next) => controler.logout(req, res, next));
+userRouter.post("/login", (req, res, next) => controler.login(req, res, next));
+userRouter.post("/refresh-token", (req, res, next) => controler.refreshToken(req, res, next));
+userRouter.post("/password/forget", (req, res, next) => controler.forgetPassword(req, res, next));
+userRouter.post("/verify-user", (req, res, next) => controler.verifyUser(req, res, next));
+userRouter.post("/password/reset", userAuth_1.authenticate, (req, res, next) => controler.resetPassword(req, res, next));
+userRouter.post("/otp/submit/forgetpassword", (req, res, next) => controler.submitOtpForgetPassword(req, res, next));
+userRouter.post("/google/auth", (req, res, next) => { controler.googleAuth(req, res, next); });
+exports.default = userRouter;
